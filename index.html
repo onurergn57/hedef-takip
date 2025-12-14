@@ -1,0 +1,622 @@
+﻿<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mal Varlığım</title>
+  <meta name="theme-color" content="#0b1220" />
+  <style>
+    :root{
+      --bg:#0b1220; --muted:#97a3b6; --text:#eaf0ff;
+      --line:#23314f; --good:#40d38a; --bad:#ff6b6b; --accent:#7aa7ff;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --r:16px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:radial-gradient(1200px 800px at 10% 0%, #142040 0%, var(--bg) 55%); color:var(--text)}
+    header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg, rgba(11,18,32,.92), rgba(11,18,32,.65)); backdrop-filter: blur(10px); border-bottom:1px solid rgba(35,49,79,.55)}
+    .wrap{max-width:1040px;margin:0 auto;padding:14px 14px}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .title{font-weight:900;letter-spacing:.2px}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid rgba(35,49,79,.8);border-radius:999px;background:rgba(18,26,43,.55);color:var(--muted);font-size:13px}
+    .grid{display:grid;gap:12px}
+    @media(min-width:920px){ .grid{grid-template-columns: 1.1fr .9fr} }
+    .card{background:linear-gradient(180deg, rgba(18,26,43,.92), rgba(18,26,43,.78)); border:1px solid rgba(35,49,79,.8); border-radius:var(--r); box-shadow:var(--shadow)}
+    .card h2{margin:0;font-size:16px}
+    .card .hd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 14px;border-bottom:1px solid rgba(35,49,79,.65)}
+    .card .bd{padding:14px}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .f{flex:1;min-width:210px}
+    label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
+    input,select,button{
+      width:100%; padding:12px 12px; border-radius:12px;
+      border:1px solid rgba(35,49,79,.85); background:#0f1729; color:var(--text);
+      outline:none;
+    }
+    input:focus,select:focus{border-color:rgba(122,167,255,.9); box-shadow:0 0 0 3px rgba(122,167,255,.14)}
+    button{cursor:pointer;background:linear-gradient(180deg, rgba(122,167,255,.95), rgba(122,167,255,.75)); border:0; color:#071024; font-weight:900}
+    button.secondary{background:rgba(15,23,41,.9); border:1px solid rgba(35,49,79,.85); color:var(--text); font-weight:800}
+    button.good{background:linear-gradient(180deg, rgba(64,211,138,.95), rgba(64,211,138,.75)); color:#05160f}
+    .kpi{display:grid;grid-template-columns:1fr;gap:10px}
+    @media(min-width:520px){ .kpi{grid-template-columns:1fr 1fr} }
+    .k{padding:12px;border-radius:14px;border:1px solid rgba(35,49,79,.75);background:rgba(15,23,41,.65)}
+    .k .t{font-size:12px;color:var(--muted)}
+    .k .v{font-size:22px;font-weight:900;margin-top:4px}
+    .k .s{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.35}
+    .goodTxt{color:var(--good)} .accentTxt{color:var(--accent)}
+    .hint{font-size:12px;color:var(--muted);line-height:1.45}
+    .sep{height:1px;background:rgba(35,49,79,.65);margin:12px 0}
+    .item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:12px;border:1px solid rgba(35,49,79,.65);background:rgba(15,23,41,.55)}
+    .item .l{color:var(--muted);font-size:12px}
+    .item .r{font-weight:900;text-align:right}
+    .tiny{font-size:11px;color:var(--muted)}
+    .tbl{width:100%;border-collapse:separate;border-spacing:0 8px}
+    .tbl th{font-size:12px;color:var(--muted);text-align:left;font-weight:800;padding:0 6px}
+    .tbl td{background:rgba(15,23,41,.55);border:1px solid rgba(35,49,79,.65);padding:10px 10px;border-radius:12px}
+    .mono{font-variant-numeric: tabular-nums}
+    .tag{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid rgba(35,49,79,.8);background:rgba(15,23,41,.55);color:var(--muted);font-size:12px}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div class="title">💼 Mal Varlığım</div>
+      <div class="pill" id="statusPill">⏳ Fiyatlar bekleniyor…</div>
+      <div class="pill">Model: <b>Piyasa/Bozdurma</b></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+    <!-- LEFT -->
+    <section class="card">
+      <div class="hd">
+        <h2>Varlık Girişi</h2>
+        <div class="row" style="min-width:220px">
+          <button class="secondary" id="btnNow">Şimdi Yenile</button>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="hint">
+          Kutular boş gelir. Değer yazıp <b>Kaydet</b>’e basınca kayıtlı tablo güncellenir ve kutular temizlenir.
+          Boş bıraktığın alanlar <b>mevcut değerini korur</b>.
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="row">
+          <div class="f">
+            <label>TL (nakit)</label>
+            <input id="inTL" type="number" inputmode="decimal" placeholder="Örn: 125000" />
+          </div>
+          <div class="f">
+            <label>USD</label>
+            <input id="inUSD" type="number" inputmode="decimal" placeholder="Örn: 2500" />
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="row">
+          <div class="f">
+            <label>Gram Altın (gram)</label>
+            <input id="inGoldGram" type="number" inputmode="decimal" placeholder="Örn: 50" />
+          </div>
+          <div class="f">
+            <label>Gram Altın Ayar</label>
+            <select id="inGoldKarat">
+              <option value="24">24 Ayar</option>
+              <option value="22">22 Ayar</option>
+              <option value="18">18 Ayar</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div class="f">
+            <label>Çeyrek Altın (adet)</label>
+            <input id="inQuarter" type="number" inputmode="decimal" placeholder="Örn: 3" />
+          </div>
+          <div class="f">
+            <label>Çeyrek Ayar</label>
+            <select id="inQuarterKarat">
+              <option value="24">24 Ayar</option>
+              <option value="22" selected>22 Ayar</option>
+              <option value="18">18 Ayar</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="row">
+          <div class="f">
+            <label>Bilezik (gram)</label>
+            <input id="inBraceletGram" type="number" inputmode="decimal" placeholder="Örn: 30" />
+          </div>
+          <div class="f">
+            <label>Bilezik Ayar</label>
+            <select id="inBraceletKarat">
+              <option value="24">24 Ayar</option>
+              <option value="22" selected>22 Ayar</option>
+              <option value="18">18 Ayar</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="row">
+          <div class="f">
+            <label>Hedef Miktar (TL)</label>
+            <input id="inTarget" type="number" inputmode="decimal" placeholder="Örn: 1000000" />
+          </div>
+          <div class="f">
+            <label>Otomatik Yenile</label>
+            <select id="inRefresh">
+              <option value="0">Kapalı</option>
+              <option value="30" selected>30 saniye</option>
+              <option value="60">60 saniye</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px">
+          <div class="f">
+            <button id="btnSave">Kaydet</button>
+          </div>
+          <div class="f">
+            <button class="secondary" id="btnReset">Sıfırla</button>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="hint">
+          <b>Kalibrasyon (piyasa/bozdurma için)</b><br/>
+          Buraya “senin gördüğün” fiyatları yaz → <b>Kalibre Et</b> → uygulama katsayıyı otomatik hesaplar.<br/>
+          Örn: Gram 24 ayar bozdurma/satış = <b>5961</b>, Çeyrek satış = <b>9710</b>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div class="f">
+            <label>Gram (24 ayar) piyasa/bozdurma (TL)</label>
+            <input id="inMarketGram" type="number" inputmode="decimal" placeholder="Örn: 5961" />
+          </div>
+          <div class="f">
+            <label>Çeyrek satış (TL) (seçili ayara göre)</label>
+            <input id="inMarketQuarter" type="number" inputmode="decimal" placeholder="Örn: 9710" />
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div class="f">
+            <button class="good" id="btnCalibrate">Kalibre Et</button>
+          </div>
+          <div class="f">
+            <button class="secondary" id="btnResetCal">Kalibrasyonu Sıfırla</button>
+          </div>
+        </div>
+
+        <div class="tiny" id="calInfo" style="margin-top:8px;color:var(--muted)">—</div>
+      </div>
+    </section>
+
+    <!-- RIGHT -->
+    <section class="card">
+      <div class="hd">
+        <h2>Özet & Mal Varlığım</h2>
+        <div class="tiny" id="lastUpdate">—</div>
+      </div>
+      <div class="bd">
+        <div class="kpi">
+          <div class="k">
+            <div class="t">Toplam Mal Varlığı</div>
+            <div class="v mono" id="outTotal">0 TL</div>
+            <div class="s" id="outBreak">—</div>
+          </div>
+          <div class="k">
+            <div class="t">Hedefe Kalan (TL)</div>
+            <div class="v mono accentTxt" id="outRemain">—</div>
+            <div class="s" id="outTargetHint">Hedef: —</div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="item">
+          <div>
+            <div class="l">USD/TRY</div>
+            <div class="tiny">USD → TL dönüşüm</div>
+          </div>
+          <div class="r mono" id="rateUsdTry">—</div>
+        </div>
+
+        <!-- ✅ SPOT satırı KALDIRILDI -->
+
+        <div class="item">
+          <div>
+            <div class="l">Gram Altın (24 ayar) PİYASA/BOZDURMA (TL)</div>
+            <div class="tiny">Kalibrasyon uygulanmış</div>
+          </div>
+          <div class="r mono" id="rateGoldMarket">—</div>
+        </div>
+
+        <div class="item">
+          <div>
+            <div class="l">Çeyrek Altın (1 adet) PİYASA (TL) (yaklaşık)</div>
+            <div class="tiny">1 çeyrek ≈ 1.75g × seçili ayar × kalibrasyon</div>
+          </div>
+          <div class="r mono" id="rateQuarterMarketUnit">—</div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="hint" style="margin-bottom:8px">
+          <b>Mal varlığım tablosu</b> (kayıtlı değerler + TL karşılığı):
+          <div class="tiny" style="margin-top:6px">
+            <span class="tag">Altın TL karşılığı: PİYASA/BOZDURMA</span>
+          </div>
+        </div>
+
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th style="width:28%">Varlık</th>
+              <th style="width:24%">Miktar</th>
+              <th style="width:18%">Ayar</th>
+              <th style="width:30%">TL Karşılığı</th>
+            </tr>
+          </thead>
+          <tbody id="assetTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+(() => {
+  const KEY = "wealth_v3_market";
+
+  const $ = (id) => document.getElementById(id);
+
+  const fmtTL = (n) => {
+    if (!isFinite(n)) return "—";
+    return new Intl.NumberFormat("tr-TR", { style:"currency", currency:"TRY", maximumFractionDigits: 2 }).format(n);
+  };
+  const fmtNum = (n, d=6) => isFinite(n) ? Number(n).toFixed(d) : "—";
+  const nowStr = () => new Date().toLocaleString("tr-TR");
+
+  const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; } };
+  const save = (obj) => localStorage.setItem(KEY, JSON.stringify(obj));
+
+  function numOrNull(v){
+    if (v === "" || v === null || v === undefined) return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function purity(karat){ return (Number(karat)||24) / 24; }
+
+  let state = {
+    tl: 0,
+    usd: 0,
+
+    goldGram: 0,
+    goldKarat: 24,
+
+    quarter: 0,
+    quarterKarat: 22,
+
+    braceletGram: 0,
+    braceletKarat: 22,
+
+    target: 0,
+    refreshSec: 30,
+
+    // Live fetched
+    usdtry: NaN,
+    xauUsdPerOz: NaN,
+    goldSpotTryPerGram24: NaN, // internal reference only
+
+    // Market calibration multipliers
+    gramMarketMult: 1.0,
+    quarterMarketMult: 1.0,
+    lastCal: null,
+
+    lastFetch: null
+  };
+
+  async function fetchUsdTry() {
+    const url = "https://open.er-api.com/v6/latest/USD";
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error("USD/TRY alınamadı");
+    const j = await r.json();
+    const v = j?.rates?.TRY;
+    if (!v) throw new Error("USD/TRY verisi yok");
+    return Number(v);
+  }
+
+  async function fetchXauUsdPerOz() {
+    const candidates = [
+      "https://api.gold-api.com/price/XAU",
+      "https://api.gold-api.com/price?symbol=XAU",
+      "https://api.gold-api.com/price/XAUUSD"
+    ];
+    let lastErr = null;
+    for (const url of candidates) {
+      try {
+        const r = await fetch(url, { cache: "no-store" });
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        const j = await r.json();
+        const p = j?.price ?? j?.value ?? j?.data?.price ?? j?.result?.price;
+        if (!p) throw new Error("price alanı yok");
+        return Number(p);
+      } catch (e) { lastErr = e; }
+    }
+    throw new Error("Altın fiyatı alınamadı: " + (lastErr?.message || ""));
+  }
+
+  let timer = null;
+
+  async function refreshPrices() {
+    $("statusPill").textContent = "⏳ Güncelleniyor…";
+    try {
+      const [usdtry, xauPerOz] = await Promise.all([fetchUsdTry(), fetchXauUsdPerOz()]);
+      state.usdtry = usdtry;
+      state.xauUsdPerOz = xauPerOz;
+
+      const OZ_TO_GRAM = 31.1034768;
+      const goldUsdPerGram24 = xauPerOz / OZ_TO_GRAM;
+      state.goldSpotTryPerGram24 = goldUsdPerGram24 * usdtry;
+
+      state.lastFetch = nowStr();
+      save(state);
+    } catch (e) {
+      console.warn(e);
+      $("statusPill").textContent = "⚠️ Güncelleme hatası (internet/API)";
+    } finally {
+      render();
+    }
+  }
+
+  function startTimer() {
+    if (timer) clearInterval(timer);
+    const sec = Number(state.refreshSec || 0);
+    if (sec > 0) timer = setInterval(refreshPrices, sec * 1000);
+  }
+
+  function marketGram24(){
+    const spot = Number(state.goldSpotTryPerGram24);
+    if (!isFinite(spot)) return NaN;
+    return spot * Number(state.gramMarketMult || 1);
+  }
+
+  function baseQuarterUnitFromMarketGram(){
+    const g = marketGram24();
+    if (!isFinite(g)) return NaN;
+    const gross = 1.75;
+    return gross * purity(state.quarterKarat || 22) * g;
+  }
+
+  function quarterUnitMarket(){
+    const base = baseQuarterUnitFromMarketGram();
+    if (!isFinite(base)) return NaN;
+    return base * Number(state.quarterMarketMult || 1);
+  }
+
+  function calc() {
+    const tl = Number(state.tl || 0);
+    const usd = Number(state.usd || 0);
+
+    const usdtry = Number(state.usdtry);
+    const usdTL = isFinite(usdtry) ? usd * usdtry : NaN;
+
+    const gram24Market = marketGram24();
+    const qUnit = quarterUnitMarket();
+
+    const goldTL = isFinite(gram24Market)
+      ? (Number(state.goldGram||0) * purity(state.goldKarat||24) * gram24Market)
+      : NaN;
+
+    const quarterTL = isFinite(qUnit) ? (Number(state.quarter||0) * qUnit) : NaN;
+
+    const braceletTL = isFinite(gram24Market)
+      ? (Number(state.braceletGram||0) * purity(state.braceletKarat||22) * gram24Market)
+      : NaN;
+
+    const total = tl
+      + (isFinite(usdTL) ? usdTL : 0)
+      + (isFinite(goldTL) ? goldTL : 0)
+      + (isFinite(quarterTL) ? quarterTL : 0)
+      + (isFinite(braceletTL) ? braceletTL : 0);
+
+    const target = Number(state.target||0);
+    const remain = target > 0 ? Math.max(0, target - total) : NaN;
+
+    return { tl, usd, usdTL, usdtry, gram24Market, qUnit, goldTL, quarterTL, braceletTL, total, target, remain };
+  }
+
+  function renderTable(c){
+    const tbody = $("assetTable");
+    const rows = [
+      ["TL (Nakit)", `${c.tl || 0}`, "—", fmtTL(c.tl || 0)],
+      ["USD", `${c.usd || 0}`, "—", (isFinite(c.usdTL) ? fmtTL(c.usdTL) : "—")],
+      ["Gram Altın", `${Number(state.goldGram||0)} gr`, `${state.goldKarat} ayar`, (isFinite(c.goldTL) ? fmtTL(c.goldTL) : "—")],
+      ["Çeyrek Altın", `${Number(state.quarter||0)} adet`, `${state.quarterKarat} ayar`, (isFinite(c.quarterTL) ? fmtTL(c.quarterTL) : "—")],
+      ["Bilezik", `${Number(state.braceletGram||0)} gr`, `${state.braceletKarat} ayar`, (isFinite(c.braceletTL) ? fmtTL(c.braceletTL) : "—")]
+    ];
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td><b>${r[0]}</b></td>
+        <td class="mono">${r[1]}</td>
+        <td class="mono">${r[2]}</td>
+        <td class="mono"><b>${r[3]}</b></td>
+      </tr>
+    `).join("");
+  }
+
+  function render() {
+    const c = calc();
+
+    if (state.lastFetch) {
+      $("lastUpdate").textContent = "Son güncelleme: " + state.lastFetch;
+      $("statusPill").textContent = "✅ Güncel • " + state.lastFetch;
+    } else {
+      $("lastUpdate").textContent = "—";
+      $("statusPill").textContent = "⏳ Fiyatlar bekleniyor…";
+    }
+
+    $("outTotal").textContent = fmtTL(c.total);
+    $("outBreak").textContent =
+      `TL: ${fmtTL(c.tl)} • USD: ${isFinite(c.usdTL)?fmtTL(c.usdTL):"—"} • Altın: ${isFinite(c.goldTL)?fmtTL(c.goldTL):"—"} • Çeyrek: ${isFinite(c.quarterTL)?fmtTL(c.quarterTL):"—"} • Bilezik: ${isFinite(c.braceletTL)?fmtTL(c.braceletTL):"—"}`;
+
+    if (isFinite(c.target)) {
+      $("outRemain").textContent = (c.remain <= 0) ? "🎯 Hedefe ulaştın!" : fmtTL(c.remain);
+      $("outRemain").className = "v mono " + ((c.remain <= 0) ? "goodTxt" : "accentTxt");
+      $("outTargetHint").textContent = "Hedef: " + fmtTL(c.target);
+    } else {
+      $("outRemain").textContent = "—";
+      $("outRemain").className = "v mono accentTxt";
+      $("outTargetHint").textContent = "Hedef: —";
+    }
+
+    $("rateUsdTry").textContent = isFinite(c.usdtry) ? fmtNum(c.usdtry, 4) : "—";
+    $("rateGoldMarket").textContent = isFinite(c.gram24Market) ? fmtTL(c.gram24Market) : "—";
+    $("rateQuarterMarketUnit").textContent = isFinite(c.qUnit) ? fmtTL(c.qUnit) : "—";
+
+    const gm = Number(state.gramMarketMult||1);
+    const qm = Number(state.quarterMarketMult||1);
+    $("calInfo").textContent = state.lastCal
+      ? `Kalibrasyon: Gram katsayı=${gm.toFixed(6)} • Çeyrek katsayı=${qm.toFixed(6)} • (${state.lastCal})`
+      : `Kalibrasyon yok: Gram katsayı=${gm.toFixed(6)} • Çeyrek katsayı=${qm.toFixed(6)}`;
+
+    renderTable(c);
+  }
+
+  function clearInputs(){
+    $("inTL").value = "";
+    $("inUSD").value = "";
+    $("inGoldGram").value = "";
+    $("inQuarter").value = "";
+    $("inBraceletGram").value = "";
+    $("inTarget").value = "";
+    $("inMarketGram").value = "";
+    $("inMarketQuarter").value = "";
+  }
+
+  function loadSelects(){
+    $("inGoldKarat").value = String(state.goldKarat ?? 24);
+    $("inQuarterKarat").value = String(state.quarterKarat ?? 22);
+    $("inBraceletKarat").value = String(state.braceletKarat ?? 22);
+    $("inRefresh").value = String(state.refreshSec ?? 30);
+  }
+
+  function applyInputsToState(){
+    const tl = numOrNull($("inTL").value); if (tl !== null) state.tl = tl;
+    const usd = numOrNull($("inUSD").value); if (usd !== null) state.usd = usd;
+
+    const gg = numOrNull($("inGoldGram").value); if (gg !== null) state.goldGram = gg;
+    const q = numOrNull($("inQuarter").value); if (q !== null) state.quarter = q;
+    const bg = numOrNull($("inBraceletGram").value); if (bg !== null) state.braceletGram = bg;
+
+    const tgt = numOrNull($("inTarget").value); if (tgt !== null) state.target = tgt;
+
+    state.goldKarat = Number($("inGoldKarat").value || state.goldKarat);
+    state.quarterKarat = Number($("inQuarterKarat").value || state.quarterKarat);
+    state.braceletKarat = Number($("inBraceletKarat").value || state.braceletKarat);
+    state.refreshSec = Number($("inRefresh").value || state.refreshSec);
+  }
+
+  function calibrate(){
+    const mGram = numOrNull($("inMarketGram").value);
+    const mQuarter = numOrNull($("inMarketQuarter").value);
+
+    const spot = Number(state.goldSpotTryPerGram24);
+    if (!isFinite(spot) || spot <= 0){
+      alert("Önce fiyatların gelmesi lazım. 'Şimdi Yenile'ye bas.");
+      return;
+    }
+
+    if (mGram !== null && mGram > 0){
+      state.gramMarketMult = mGram / spot;
+    }
+
+    const gMarket = marketGram24();
+    const baseQuarter = 1.75 * purity(state.quarterKarat || 22) * gMarket;
+    if (mQuarter !== null && mQuarter > 0 && isFinite(baseQuarter) && baseQuarter > 0){
+      state.quarterMarketMult = mQuarter / baseQuarter;
+    }
+
+    state.lastCal = nowStr();
+    save(state);
+    render();
+  }
+
+  function resetCalibration(){
+    if (!confirm("Kalibrasyonu sıfırlayayım mı? (katsayılar 1.0 olacak)")) return;
+    state.gramMarketMult = 1.0;
+    state.quarterMarketMult = 1.0;
+    state.lastCal = null;
+    save(state);
+    render();
+  }
+
+  $("btnSave").addEventListener("click", async () => {
+    applyInputsToState();
+    save(state);
+    startTimer();
+    clearInputs();
+    render();
+    await refreshPrices();
+  });
+
+  $("btnReset").addEventListener("click", () => {
+    if (!confirm("Tüm kayıtlı verileri sıfırlayayım mı?")) return;
+    localStorage.removeItem(KEY);
+    state = {
+      tl: 0, usd: 0,
+      goldGram: 0, goldKarat: 24,
+      quarter: 0, quarterKarat: 22,
+      braceletGram: 0, braceletKarat: 22,
+      target: 0, refreshSec: 30,
+      usdtry: NaN, xauUsdPerOz: NaN, goldSpotTryPerGram24: NaN,
+      gramMarketMult: 1.0, quarterMarketMult: 1.0, lastCal: null,
+      lastFetch: null
+    };
+    loadSelects();
+    clearInputs();
+    startTimer();
+    render();
+  });
+
+  $("btnNow").addEventListener("click", refreshPrices);
+  $("btnCalibrate").addEventListener("click", calibrate);
+  $("btnResetCal").addEventListener("click", resetCalibration);
+
+  $("inRefresh").addEventListener("change", () => {
+    state.refreshSec = Number($("inRefresh").value || 0);
+    save(state);
+    startTimer();
+  });
+
+  $("inQuarterKarat").addEventListener("change", () => {
+    state.quarterKarat = Number($("inQuarterKarat").value || state.quarterKarat);
+    save(state);
+    render();
+  });
+
+  // Init
+  state = { ...state, ...load() };
+  loadSelects();
+  clearInputs();
+  startTimer();
+  render();
+  refreshPrices();
+})();
+</script>
+</body>
+</html>
